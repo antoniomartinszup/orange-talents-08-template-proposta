@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class ErroDeValidacaoHandler {
@@ -31,5 +32,15 @@ public class ErroDeValidacaoHandler {
             dto.add(erro);
         });
         return dto;
+    }
+
+    @ResponseStatus(code = HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(ResponseStatusException.class)
+    public ErroDeFormularioDto handleResponseStatusException(ResponseStatusException exception) {
+        return new ErroDeFormularioDto(exception.getLocalizedMessage().concat(" Proposta já enviada para" +
+                " o documento apresentado!"),
+                exception.getMessage().concat("  O codigo indica que o servidor entende o tipo de conteúdo" +
+                        " da entidade da requisição, e a sintaxe da requisição esta correta, mas não foi" +
+                        " possível processar as instruções presentes"));
     }
 }

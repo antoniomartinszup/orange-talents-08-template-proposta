@@ -15,6 +15,7 @@ public class Proposta {
 
     @AnyCPFOrCNPJ
     @NotBlank
+    @Column(unique = true)
     private String documento;
 
     @Email

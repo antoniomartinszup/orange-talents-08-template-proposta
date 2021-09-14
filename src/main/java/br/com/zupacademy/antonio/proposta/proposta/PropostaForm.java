@@ -1,9 +1,11 @@
 package br.com.zupacademy.antonio.proposta.proposta;
 
 import br.com.zupacademy.antonio.proposta.validate.AnyCPFOrCNPJ;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 public class PropostaForm {
 
@@ -37,7 +39,13 @@ public class PropostaForm {
         this.salario = salario;
     }
 
-    public Proposta converteParaModelProposta() {
+    public Proposta converteParaModelProposta(PropostaRepository pRepo) {
+
+        Optional<Proposta> proposta = pRepo.findByDocumento(this.documento);
+        if (proposta.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
         return new Proposta(this.documento, this.email, this.nome, this.endereco, this.salario);
     }
 

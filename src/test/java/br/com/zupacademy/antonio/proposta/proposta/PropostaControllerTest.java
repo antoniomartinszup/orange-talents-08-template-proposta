@@ -29,6 +29,9 @@ class PropostaControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private PropostaRepository propostaRepository;
+
     Gson gson = new Gson();
 
     @Test
@@ -60,6 +63,28 @@ class PropostaControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].campo").value("documento"))
                 .andExpect(jsonPath("$[0].erro").exists())
+                .andReturn().getResponse();
+    }
+
+    @Test
+    @DisplayName("Falha no cadastro da Proposta atributo documento duplicado")
+    public void falhaNoCadastroPropostaFormatoDocumentoDuplicado() throws Exception {
+
+        Proposta proposta = new Proposta("064.326.849-94", "antonio@email.com", "Antonio",
+                "Rua Waldemar Eggers", new BigDecimal("400.00"));
+        propostaRepository.save(proposta);
+
+        PropostaForm propostaForm = new PropostaForm("064.326.849-94", "antonio@email.com", "Antonio",
+                "Rua Waldemar Eggers", new BigDecimal("400.00"));
+
+        mockMvc.perform(post("/propostas")
+                        .locale(new Locale("pt", "BR"))
+                        .content(gson.toJson(propostaForm))
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.campo").value("422 UNPROCESSABLE_ENTITY Proposta já enviada para o documento apresentado!"))
+                .andExpect(jsonPath("$.erro").exists())
                 .andReturn().getResponse();
     }
 }

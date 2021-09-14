@@ -24,7 +24,7 @@ public class PropostaController {
     public ResponseEntity<PropostaDto> salvar(@RequestBody @Valid PropostaForm propostaForm,
                                               UriComponentsBuilder uriBuilder) {
 
-        Proposta propostaSalvo = propostaRepository.save(propostaForm.converteParaModelProposta());
+        Proposta propostaSalvo = propostaRepository.save(propostaForm.converteParaModelProposta(propostaRepository));
         URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(propostaSalvo.getId()).toUri();
         return ResponseEntity.created(uri).body(new PropostaDto(propostaSalvo));
     }
