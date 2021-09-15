@@ -17,8 +17,8 @@ import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,21 +38,56 @@ class PropostaControllerTest {
     @DisplayName("Cadastra Proposta com sucesso")
     public void cadastraPropostaComSucesso() throws Exception {
 
-        PropostaForm propostaForm = new PropostaForm("064.326.849-94", "antonio@email.com", "Antonio",
+        PropostaForm propostaForm = new PropostaForm("642.325.460-57", "antonio@email.com", "Antonio",
                 "Rua Waldemar Eggers", new BigDecimal("400.00"));
 
         mockMvc.perform(post("/propostas")
                         .content(gson.toJson(propostaForm))
                         .contentType(MediaType.APPLICATION_JSON))
 
-                .andExpect(status().isCreated());
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(jsonPath("$.id").exists());
+    }
+
+    @Test
+    @DisplayName("Cadastra Proposta com sucesso status ELEGIVEL")
+    public void cadastraPropostaComSucessoStatusElegivel() throws Exception {
+
+        PropostaForm propostaForm = new PropostaForm("642.325.460-57", "antonio@email.com", "Antonio",
+                "Rua Waldemar Eggers", new BigDecimal("400.00"));
+
+        mockMvc.perform(post("/propostas")
+                        .content(gson.toJson(propostaForm))
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.propostaStatus").value("ELEGIVEL"));
+    }
+
+    @Test
+    @DisplayName("Cadastra Proposta com sucesso status NAO_ELEGIVEL")
+    public void cadastraPropostaComSucessoStatusNaoElegivel() throws Exception {
+
+        PropostaForm propostaForm = new PropostaForm("314.045.970-00", "antonio@email.com", "Antonio",
+                "Rua Waldemar Eggers", new BigDecimal("400.00"));
+
+        mockMvc.perform(post("/propostas")
+                        .content(gson.toJson(propostaForm))
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.propostaStatus").value("NAO_ELEGIVEL"));
     }
 
     @Test
     @DisplayName("Falha no cadastro da Proposta atributo documento formato invalido")
     public void falhaNoCadastroPropostaFormatoDocumento() throws Exception {
 
-        PropostaForm propostaForm = new PropostaForm("064.326.849-945", "antonio@email.com", "Antonio",
+        PropostaForm propostaForm = new PropostaForm("642.325.460-573", "antonio@email.com", "Antonio",
                 "Rua Waldemar Eggers", new BigDecimal("400.00"));
 
         mockMvc.perform(post("/propostas")
@@ -60,6 +95,7 @@ class PropostaControllerTest {
                         .content(gson.toJson(propostaForm))
                         .contentType(MediaType.APPLICATION_JSON))
 
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].campo").value("documento"))
                 .andExpect(jsonPath("$[0].erro").exists())
@@ -70,11 +106,11 @@ class PropostaControllerTest {
     @DisplayName("Falha no cadastro da Proposta atributo documento duplicado")
     public void falhaNoCadastroPropostaFormatoDocumentoDuplicado() throws Exception {
 
-        Proposta proposta = new Proposta("064.326.849-94", "antonio@email.com", "Antonio",
+        Proposta proposta = new Proposta("642.325.460-57", "antonio@email.com", "Antonio",
                 "Rua Waldemar Eggers", new BigDecimal("400.00"));
         propostaRepository.save(proposta);
 
-        PropostaForm propostaForm = new PropostaForm("064.326.849-94", "antonio@email.com", "Antonio",
+        PropostaForm propostaForm = new PropostaForm("642.325.460-57", "antonio@email.com", "Antonio",
                 "Rua Waldemar Eggers", new BigDecimal("400.00"));
 
         mockMvc.perform(post("/propostas")
@@ -82,6 +118,7 @@ class PropostaControllerTest {
                         .content(gson.toJson(propostaForm))
                         .contentType(MediaType.APPLICATION_JSON))
 
+                .andDo(print())
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.campo").value("422 UNPROCESSABLE_ENTITY Proposta já enviada para o documento apresentado!"))
                 .andExpect(jsonPath("$.erro").exists())

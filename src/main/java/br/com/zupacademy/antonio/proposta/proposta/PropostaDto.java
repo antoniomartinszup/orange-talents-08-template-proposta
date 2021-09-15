@@ -10,6 +10,7 @@ public class PropostaDto {
     private String nome;
     private String endereco;
     private BigDecimal salario;
+    private PropostaStatus propostaStatus;
 
     public PropostaDto(Proposta proposta) {
         this.id = proposta.getId();
@@ -18,6 +19,7 @@ public class PropostaDto {
         this.nome = proposta.getNome();
         this.endereco = proposta.getEndereco();
         this.salario = proposta.getSalario();
+        this.propostaStatus = proposta.getPropostaStatus();
     }
 
     public Long getId() {
@@ -42,5 +44,9 @@ public class PropostaDto {
 
     public BigDecimal getSalario() {
         return salario;
+    }
+
+    public PropostaStatus getPropostaStatus() {
+        return propostaStatus;
     }
 }

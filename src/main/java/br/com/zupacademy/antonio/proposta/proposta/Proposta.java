@@ -1,6 +1,10 @@
 package br.com.zupacademy.antonio.proposta.proposta;
 
+import br.com.zupacademy.antonio.proposta.proposta.analise.AnaliseFinanceiraFeign;
+import br.com.zupacademy.antonio.proposta.proposta.analise.AnalisePropostaDto;
+import br.com.zupacademy.antonio.proposta.proposta.analise.AnalisePropostaForm;
 import br.com.zupacademy.antonio.proposta.validate.AnyCPFOrCNPJ;
+import feign.FeignException;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -32,6 +36,9 @@ public class Proposta {
     @PositiveOrZero
     private BigDecimal salario;
 
+    @Enumerated(EnumType.STRING)
+    private PropostaStatus propostaStatus;
+
     @Deprecated
     public Proposta() {
     }
@@ -46,6 +53,18 @@ public class Proposta {
         this.nome = nome;
         this.endereco = endereco;
         this.salario = salario;
+    }
+
+    public void propostaStatus(AnaliseFinanceiraFeign analiseFinanceiraFeign) {
+        try {
+            AnalisePropostaForm analisePropostaForm = new AnalisePropostaForm(getDocumento(), getNome(), getId());
+            AnalisePropostaDto analisePropostaDto = analiseFinanceiraFeign.buscaAprovacao(analisePropostaForm);
+            if (analisePropostaDto.getResultadoSolicitacao().equals("SEM_RESTRICAO")) {
+                setPropostaStatus(PropostaStatus.ELEGIVEL);
+            }
+        } catch (FeignException feignException) {
+            setPropostaStatus(PropostaStatus.NAO_ELEGIVEL);
+        }
     }
 
     public Long getId() {
@@ -70,5 +89,13 @@ public class Proposta {
 
     public BigDecimal getSalario() {
         return salario;
+    }
+
+    public PropostaStatus getPropostaStatus() {
+        return propostaStatus;
+    }
+
+    public void setPropostaStatus(PropostaStatus propostaStatus) {
+        this.propostaStatus = propostaStatus;
     }
 }
