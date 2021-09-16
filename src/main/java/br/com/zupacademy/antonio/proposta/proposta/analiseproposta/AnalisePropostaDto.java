@@ -1,4 +1,4 @@
-package br.com.zupacademy.antonio.proposta.proposta.analise;
+package br.com.zupacademy.antonio.proposta.proposta.analiseproposta;
 
 public class AnalisePropostaDto {
 

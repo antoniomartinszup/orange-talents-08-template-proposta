@@ -1,6 +1,6 @@
 package br.com.zupacademy.antonio.proposta.proposta;
 
-import br.com.zupacademy.antonio.proposta.proposta.analise.AnaliseFinanceiraFeign;
+import br.com.zupacademy.antonio.proposta.proposta.analiseproposta.AnaliseFinanceiraFeign;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

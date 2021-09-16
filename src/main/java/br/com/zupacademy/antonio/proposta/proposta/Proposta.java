@@ -1,8 +1,9 @@
 package br.com.zupacademy.antonio.proposta.proposta;
 
-import br.com.zupacademy.antonio.proposta.proposta.analise.AnaliseFinanceiraFeign;
-import br.com.zupacademy.antonio.proposta.proposta.analise.AnalisePropostaDto;
-import br.com.zupacademy.antonio.proposta.proposta.analise.AnalisePropostaForm;
+import br.com.zupacademy.antonio.proposta.cartao.Cartao;
+import br.com.zupacademy.antonio.proposta.proposta.analiseproposta.AnaliseFinanceiraFeign;
+import br.com.zupacademy.antonio.proposta.proposta.analiseproposta.AnalisePropostaDto;
+import br.com.zupacademy.antonio.proposta.proposta.analiseproposta.AnalisePropostaForm;
 import br.com.zupacademy.antonio.proposta.validate.AnyCPFOrCNPJ;
 import feign.FeignException;
 
@@ -38,6 +39,9 @@ public class Proposta {
 
     @Enumerated(EnumType.STRING)
     private PropostaStatus propostaStatus;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private Cartao cartao;
 
     @Deprecated
     public Proposta() {
@@ -97,5 +101,13 @@ public class Proposta {
 
     public void setPropostaStatus(PropostaStatus propostaStatus) {
         this.propostaStatus = propostaStatus;
+    }
+
+    public Cartao getCartao() {
+        return cartao;
+    }
+
+    public void setCartao(Cartao cartao) {
+        this.cartao = cartao;
     }
 }
