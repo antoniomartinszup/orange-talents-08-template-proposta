@@ -1,15 +1,18 @@
 package br.com.zupacademy.antonio.proposta.cartao;
 
+import br.com.zupacademy.antonio.proposta.biometria.Biometria;
 import br.com.zupacademy.antonio.proposta.proposta.Proposta;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Cartao {
@@ -30,6 +33,9 @@ public class Cartao {
     @NotNull
     @OneToOne(mappedBy = "cartao")
     private Proposta proposta;
+
+    @OneToMany(mappedBy = "cartao")
+    private List<Biometria> biometrias = new ArrayList<>();
 
     @Deprecated
     public Cartao() {
@@ -61,5 +67,9 @@ public class Cartao {
 
     public BigDecimal getLimite() {
         return limite;
+    }
+
+    public List<Biometria> getBiometrias() {
+        return biometrias;
     }
 }
