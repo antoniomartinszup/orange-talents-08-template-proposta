@@ -2,11 +2,10 @@ package br.com.zupacademy.antonio.proposta.cartao;
 
 import br.com.zupacademy.antonio.proposta.biometria.Biometria;
 import br.com.zupacademy.antonio.proposta.proposta.Proposta;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -30,6 +29,9 @@ public class Cartao {
     @NotNull
     private BigDecimal limite;
 
+    @Enumerated(EnumType.STRING)
+    private CartaoStatus cartaoStatus = CartaoStatus.ATIVO;
+
     @NotNull
     @OneToOne(mappedBy = "cartao")
     private Proposta proposta;
@@ -47,6 +49,16 @@ public class Cartao {
         this.geradoEm = geradoEm;
         this.limite = limite;
         this.proposta = proposta;
+    }
+
+    public void alteraStatusCartao() {
+        this.cartaoStatus = CartaoStatus.BLOQUEADO;
+    }
+
+    public void verificaStatusCartao() {
+        if (this.cartaoStatus == CartaoStatus.BLOQUEADO) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
     }
 
     public String getId() {
@@ -71,5 +83,9 @@ public class Cartao {
 
     public List<Biometria> getBiometrias() {
         return biometrias;
+    }
+
+    public CartaoStatus getCartaoStatus() {
+        return cartaoStatus;
     }
 }
