@@ -29,8 +29,7 @@ public class BloqueioController {
             cartaoOptional.get().verificaStatusCartao();
 
             Bloqueio bloqueio = bloqueioRepository.save(bloqueioForm.converteParaModelBloqueio(cartaoOptional.get()));
-
-            cartaoOptional.get().alteraStatusCartao();
+            cartaoOptional.get().alteraStatusCartaoPedidoBloqueio();
             cartaoRepository.save(cartaoOptional.get());
 
             return ResponseEntity.ok().body(new BloqueioDto(bloqueio));

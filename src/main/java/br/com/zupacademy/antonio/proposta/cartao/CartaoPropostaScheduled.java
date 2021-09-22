@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CartaoProposta {
+public class CartaoPropostaScheduled {
 
     @Autowired
     private PropostaRepository propostaRepository;
@@ -21,7 +21,7 @@ public class CartaoProposta {
     @Autowired
     private AnaliseCartaoFeign analiseCartaoFeign;
 
-    @Scheduled(fixedDelay = 20000)
+    @Scheduled(fixedRateString = "${analise.cartao}")
     public void cartaoParaProposta() {
         List<Proposta> propostas = propostaRepository.findByPropostaStatusLikeAndCartaoNull(PropostaStatus.ELEGIVEL);
         for (Proposta proposta : propostas) {

@@ -1,6 +1,7 @@
 package br.com.zupacademy.antonio.proposta.cartao;
 
 import br.com.zupacademy.antonio.proposta.biometria.Biometria;
+import br.com.zupacademy.antonio.proposta.bloqueio.Bloqueio;
 import br.com.zupacademy.antonio.proposta.proposta.Proposta;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -36,6 +37,9 @@ public class Cartao {
     @OneToOne(mappedBy = "cartao")
     private Proposta proposta;
 
+    @OneToOne(mappedBy = "cartao")
+    private Bloqueio bloqueio;
+
     @OneToMany(mappedBy = "cartao")
     private List<Biometria> biometrias = new ArrayList<>();
 
@@ -51,12 +55,20 @@ public class Cartao {
         this.proposta = proposta;
     }
 
-    public void alteraStatusCartao() {
+    public void alteraStatusCartaoPedidoBloqueio() {
+        this.cartaoStatus = CartaoStatus.PEDIDO_BLOQUEIO;
+    }
+
+    public void alteraStatusCartaoBloqueio() {
         this.cartaoStatus = CartaoStatus.BLOQUEADO;
     }
 
+    public void alteraStatusCartaoAtivo() {
+        this.cartaoStatus = CartaoStatus.ATIVO;
+    }
+
     public void verificaStatusCartao() {
-        if (this.cartaoStatus == CartaoStatus.BLOQUEADO) {
+        if (this.cartaoStatus == CartaoStatus.PEDIDO_BLOQUEIO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
@@ -87,5 +99,9 @@ public class Cartao {
 
     public CartaoStatus getCartaoStatus() {
         return cartaoStatus;
+    }
+
+    public Bloqueio getBloqueio() {
+        return bloqueio;
     }
 }
