@@ -3,6 +3,7 @@ package br.com.zupacademy.antonio.proposta.cartao;
 import br.com.zupacademy.antonio.proposta.biometria.Biometria;
 import br.com.zupacademy.antonio.proposta.bloqueio.Bloqueio;
 import br.com.zupacademy.antonio.proposta.proposta.Proposta;
+import br.com.zupacademy.antonio.proposta.viagem.InformaViagem;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -42,6 +43,9 @@ public class Cartao {
 
     @OneToMany(mappedBy = "cartao")
     private List<Biometria> biometrias = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cartao")
+    private List<InformaViagem> informaViagemList;
 
     @Deprecated
     public Cartao() {
@@ -103,5 +107,9 @@ public class Cartao {
 
     public Bloqueio getBloqueio() {
         return bloqueio;
+    }
+
+    public List<InformaViagem> getInformaViagemList() {
+        return informaViagemList;
     }
 }
