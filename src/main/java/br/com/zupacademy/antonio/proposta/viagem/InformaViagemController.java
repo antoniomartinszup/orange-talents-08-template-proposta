@@ -2,6 +2,10 @@ package br.com.zupacademy.antonio.proposta.viagem;
 
 import br.com.zupacademy.antonio.proposta.cartao.Cartao;
 import br.com.zupacademy.antonio.proposta.cartao.CartaoRepository;
+import br.com.zupacademy.antonio.proposta.viagem.analiseviagem.AnaliseViagemDto;
+import br.com.zupacademy.antonio.proposta.viagem.analiseviagem.AnaliseViagemFeign;
+import br.com.zupacademy.antonio.proposta.viagem.analiseviagem.AnaliseViagemForm;
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +27,9 @@ public class InformaViagemController {
     @Autowired
     private CartaoRepository cartaoRepository;
 
+    @Autowired
+    private AnaliseViagemFeign analiseViagemFeign;
+
 
     @PostMapping
     public ResponseEntity<InformaViagemDto> salva(@Valid @RequestBody InformaViagemForm informaViagemForm,
@@ -32,14 +39,25 @@ public class InformaViagemController {
 
         Optional<Cartao> cartaoOptional = cartaoRepository.findById(id);
         if (cartaoOptional.isPresent()) {
+            try {
+                AnaliseViagemForm analiseViagemForm = new AnaliseViagemForm(
+                        informaViagemForm.getDestinoViagem(), informaViagemForm.getInformaFimViagemEm());
 
-            InformaViagem informaViagem = informaViagemRepository.save(
-                    informaViagemForm.converteParaModelInformaViagem(cartaoOptional.get(), userAgent, ip));
+                AnaliseViagemDto analiseViagemDto = analiseViagemFeign.informaViagem(id, analiseViagemForm);
 
-            logger.info("Viagem com id {} informada com sucesso na data de {}", informaViagem.getId(),
-                    informaViagem.getInformaViagemEm());
+                if (analiseViagemDto.getResultado().equals("CRIADO")) {
+                    InformaViagem informaViagem = informaViagemRepository.save(
+                            informaViagemForm.converteParaModelInformaViagem(cartaoOptional.get(), userAgent, ip));
 
-            return ResponseEntity.ok(new InformaViagemDto(informaViagem));
+                    logger.info("Viagem com id {} informada com sucesso na data de {}", informaViagem.getId(),
+                            informaViagem.getInformaViagemEm());
+
+                    return ResponseEntity.ok(new InformaViagemDto(informaViagem));
+                }
+            } catch (FeignException feignException) {
+                logger.error("Ocorreu uma FALHA com status {} no informe de viagem do cartão com o numero {}", feignException.status(), id);
+                return ResponseEntity.badRequest().build();
+            }
         }
         logger.info("Numero do cartão não encontrado para o id {} informado", id);
         return ResponseEntity.notFound().build();
