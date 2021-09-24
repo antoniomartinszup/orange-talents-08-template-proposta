@@ -1,8 +1,6 @@
 package br.com.zupacademy.antonio.proposta.biometria;
 
-import br.com.zupacademy.antonio.proposta.cartao.Cartao;
 import br.com.zupacademy.antonio.proposta.cartao.CartaoRepository;
-import br.com.zupacademy.antonio.proposta.proposta.PropostaForm;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 
-import java.math.BigDecimal;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;

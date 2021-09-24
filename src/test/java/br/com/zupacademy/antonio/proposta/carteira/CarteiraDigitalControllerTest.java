@@ -1,5 +1,7 @@
-package br.com.zupacademy.antonio.proposta.viagem;
+package br.com.zupacademy.antonio.proposta.carteira;
 
+import br.com.zupacademy.antonio.proposta.cartao.CartaoRepository;
+import br.com.zupacademy.antonio.proposta.proposta.PropostaRepository;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,25 +25,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-class InformaViagemControllerTest {
+class CarteiraDigitalControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     Gson gson = new Gson();
 
+    @Autowired
+    private PropostaRepository propostaRepository;
+
+    @Autowired
+    private CartaoRepository cartaoRepository;
+
     @Test
-    @DisplayName("Falha no Informe de viagem cartão não encontrado")
-    public void falhaNoInformeDeViagemCartaoNaoEncontrado() throws Exception {
+    @DisplayName("Falha na associacao cartão não encontrado")
+    public void falhaNaAssociacaoCartaoNaoEncontrado() throws Exception {
 
-        InformaViagemForm informaViagemForm = new InformaViagemForm("Joinville", null);
+        CarteiraDigitalForm carteiraDigitalForm = new CarteiraDigitalForm("antonio@email.com", ModeloCarteira.PAYPAL);
 
-        mockMvc.perform(post("/informa/viagens/cartoes/id")
+        mockMvc.perform(post("/carteiras/cartoes/id")
                         .locale(new Locale("pt", "BR"))
-                        .content(gson.toJson(informaViagemForm))
+                        .content(gson.toJson(carteiraDigitalForm))
                         .contentType(MediaType.APPLICATION_JSON))
 
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 }

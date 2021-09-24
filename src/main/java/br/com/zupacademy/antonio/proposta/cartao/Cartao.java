@@ -2,6 +2,8 @@ package br.com.zupacademy.antonio.proposta.cartao;
 
 import br.com.zupacademy.antonio.proposta.biometria.Biometria;
 import br.com.zupacademy.antonio.proposta.bloqueio.Bloqueio;
+import br.com.zupacademy.antonio.proposta.carteira.CarteiraDigital;
+import br.com.zupacademy.antonio.proposta.carteira.ModeloCarteira;
 import br.com.zupacademy.antonio.proposta.proposta.Proposta;
 import br.com.zupacademy.antonio.proposta.viagem.InformaViagem;
 import org.springframework.http.HttpStatus;
@@ -47,6 +49,9 @@ public class Cartao {
     @OneToMany(mappedBy = "cartao")
     private List<InformaViagem> informaViagemList;
 
+    @OneToMany(mappedBy = "cartao")
+    private List<CarteiraDigital> carteiraDigitalList;
+
     @Deprecated
     public Cartao() {
     }
@@ -75,6 +80,15 @@ public class Cartao {
         if (this.cartaoStatus == CartaoStatus.PEDIDO_BLOQUEIO) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
+    }
+
+    public boolean verificaAssociacao(ModeloCarteira modeloCarteira) {
+        for (CarteiraDigital carteiraDigital : carteiraDigitalList) {
+            if (carteiraDigital.getModeloCarteira().equals(modeloCarteira)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getId() {
@@ -112,4 +126,9 @@ public class Cartao {
     public List<InformaViagem> getInformaViagemList() {
         return informaViagemList;
     }
+
+    public List<CarteiraDigital> getCarteiraDigitalList() {
+        return carteiraDigitalList;
+    }
+
 }
