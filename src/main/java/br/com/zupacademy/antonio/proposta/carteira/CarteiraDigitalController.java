@@ -39,6 +39,8 @@ public class CarteiraDigitalController {
         Optional<Cartao> cartaoOptional = cartaoRepository.findById(id);
         if (cartaoOptional.isPresent()) {
             if (cartaoOptional.get().verificaAssociacao(carteiraDigitalForm.getModeloCarteira())) {
+                logger.info("Cartão com numero {} ja esta associado com sucesso com {}",
+                        cartaoOptional.get().getId(), carteiraDigitalForm.getModeloCarteira());
                 return ResponseEntity.unprocessableEntity().build();
             }
             try {
