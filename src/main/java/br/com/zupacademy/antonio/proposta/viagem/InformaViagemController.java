@@ -6,6 +6,8 @@ import br.com.zupacademy.antonio.proposta.viagem.analiseviagem.AnaliseViagemDto;
 import br.com.zupacademy.antonio.proposta.viagem.analiseviagem.AnaliseViagemFeign;
 import br.com.zupacademy.antonio.proposta.viagem.analiseviagem.AnaliseViagemForm;
 import feign.FeignException;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class InformaViagemController {
 
     private final Logger logger = LoggerFactory.getLogger(InformaViagemController.class);
+    private final Tracer tracer;
 
     @Autowired
     private InformaViagemRepository informaViagemRepository;
@@ -29,6 +32,10 @@ public class InformaViagemController {
 
     @Autowired
     private AnaliseViagemFeign analiseViagemFeign;
+
+    public InformaViagemController(Tracer tracer) {
+        this.tracer = tracer;
+    }
 
 
     @PostMapping
@@ -51,6 +58,8 @@ public class InformaViagemController {
 
                     logger.info("Viagem com id {} informada com sucesso na data de {}", informaViagem.getId(),
                             informaViagem.getInformaViagemEm());
+
+                    Span activeSpan = tracer.activeSpan().setBaggageItem("user.email", cartaoOptional.get().getProposta().getEmail());
 
                     return ResponseEntity.ok(new InformaViagemDto(informaViagem));
                 }

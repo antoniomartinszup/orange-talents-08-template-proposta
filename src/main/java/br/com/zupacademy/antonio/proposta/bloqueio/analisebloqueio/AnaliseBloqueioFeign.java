@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.PostMapping;
 public interface AnaliseBloqueioFeign {
 
     @PostMapping("/api/cartoes/{id}/bloqueios")
-        AnaliseBloqueioDto analisebloqueia(@PathVariable String id, AnaliseBloqueioForm analiseBloqueioForm);
+    AnaliseBloqueioDto analisebloqueia(@PathVariable String id, AnaliseBloqueioForm analiseBloqueioForm);
 }

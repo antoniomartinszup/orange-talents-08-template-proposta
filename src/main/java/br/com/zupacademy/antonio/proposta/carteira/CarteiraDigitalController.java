@@ -6,6 +6,8 @@ import br.com.zupacademy.antonio.proposta.carteira.analisecarteira.AnaliseCartei
 import br.com.zupacademy.antonio.proposta.carteira.analisecarteira.AnaliseCarteiraDigitalFeign;
 import br.com.zupacademy.antonio.proposta.carteira.analisecarteira.AnaliseCarteiraDigitalForm;
 import feign.FeignException;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class CarteiraDigitalController {
 
     private final Logger logger = LoggerFactory.getLogger(CarteiraDigitalController.class);
+    private final Tracer tracer;
 
     @Autowired
     private CarteiraDigitalRepository carteiraDigitalRepository;
@@ -31,6 +34,10 @@ public class CarteiraDigitalController {
 
     @Autowired
     private AnaliseCarteiraDigitalFeign analiseCarteiraDigitalFeign;
+
+    public CarteiraDigitalController(Tracer tracer) {
+        this.tracer = tracer;
+    }
 
     @PostMapping
     public ResponseEntity<CarteiraDigitalDto> salva(@PathVariable String id,
@@ -59,6 +66,8 @@ public class CarteiraDigitalController {
 
                     logger.info("Cartão com numero {} associado com sucesso com o id {}",
                             cartaoOptional.get().getId(), carteiraDigital.getId());
+
+                    Span activeSpan = tracer.activeSpan().setBaggageItem("user.email", cartaoOptional.get().getProposta().getEmail());
 
                     return ResponseEntity.created(uri).body(new CarteiraDigitalDto(carteiraDigital));
                 }

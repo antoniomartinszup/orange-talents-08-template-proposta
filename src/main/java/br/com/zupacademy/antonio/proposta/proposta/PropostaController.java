@@ -2,6 +2,8 @@ package br.com.zupacademy.antonio.proposta.proposta;
 
 import br.com.zupacademy.antonio.proposta.proposta.analiseproposta.AnaliseFinanceiraFeign;
 import br.com.zupacademy.antonio.proposta.proposta.metricasproposta.PropostaMetricas;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import java.net.URI;
 public class PropostaController {
 
     private final Logger logger = LoggerFactory.getLogger(PropostaController.class);
+    private final Tracer tracer;
 
     @Autowired
     private PropostaRepository propostaRepository;
@@ -31,10 +34,17 @@ public class PropostaController {
     @Autowired
     private PropostaMetricas propostaMetricas;
 
+    public PropostaController(Tracer tracer) {
+        this.tracer = tracer;
+    }
+
     @PostMapping
     @Transactional
     public ResponseEntity<PropostaDto> salvar(@RequestBody @Valid PropostaForm propostaForm,
                                               UriComponentsBuilder uriBuilder) {
+
+        Span activeSpan = tracer.activeSpan().setBaggageItem("user.email", propostaForm.getEmail());
+
         Proposta propostaSalva = propostaRepository.save(propostaForm.converteParaModelProposta(propostaRepository));
         propostaSalva.propostaStatus(analiseFinanceiraFeign);
 

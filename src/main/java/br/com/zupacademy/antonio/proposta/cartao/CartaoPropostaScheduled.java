@@ -6,6 +6,8 @@ import br.com.zupacademy.antonio.proposta.proposta.Proposta;
 import br.com.zupacademy.antonio.proposta.proposta.PropostaRepository;
 import br.com.zupacademy.antonio.proposta.proposta.PropostaStatus;
 import feign.FeignException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,8 @@ import java.util.List;
 
 @Component
 public class CartaoPropostaScheduled {
+
+    private final Logger logger = LoggerFactory.getLogger(CartaoPropostaScheduled.class);
 
     @Autowired
     private PropostaRepository propostaRepository;
@@ -30,7 +34,10 @@ public class CartaoPropostaScheduled {
                 Cartao cartao = analiseCartaoDto.converteParaCartao(proposta);
                 proposta.setCartao(cartao);
                 propostaRepository.save(proposta);
+                logger.info("A proposta com id {} foi associada ao cartao com id {}", proposta.getId(), cartao.getId());
             } catch (FeignException feignException) {
+                logger.error("Ocorreu uma FALHA com status {} no bloqueio do cartão com o numero {}",
+                        feignException.status(), proposta.getCartao().getId());
                 feignException.printStackTrace();
             }
         }
