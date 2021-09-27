@@ -2,6 +2,7 @@ package br.com.zupacademy.antonio.proposta.bloqueio;
 
 import br.com.zupacademy.antonio.proposta.cartao.Cartao;
 import br.com.zupacademy.antonio.proposta.cartao.CartaoRepository;
+import br.com.zupacademy.antonio.proposta.security.Mascara;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ public class BloqueioController {
             cartaoOptional.get().alteraStatusCartaoPedidoBloqueio();
             cartaoRepository.save(cartaoOptional.get());
 
-            logger.info("O cartão com o numero {} foi {} com sucesso", cartaoOptional.get().getId(),
+            logger.info("O cartão com o numero {} foi {} com sucesso", Mascara.numeroCartao(cartaoOptional.get().getId()),
                     cartaoOptional.get().getCartaoStatus());
 
             return ResponseEntity.ok().body(new BloqueioDto(bloqueio));

@@ -1,6 +1,11 @@
 package br.com.zupacademy.antonio.proposta.viagem;
 
+import br.com.zupacademy.antonio.proposta.cartao.Cartao;
+import br.com.zupacademy.antonio.proposta.cartao.CartaoRepository;
+import br.com.zupacademy.antonio.proposta.proposta.PropostaForm;
+import br.com.zupacademy.antonio.proposta.proposta.PropostaRepository;
 import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +35,19 @@ class InformaViagemControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private CartaoRepository cartaoRepository;
+
+    @Autowired
+    private PropostaRepository propostaRepository;
+
     Gson gson = new Gson();
+
+    @BeforeEach
+    void setup() {
+        cartaoRepository.deleteAll();
+        propostaRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("Falha no Informe de viagem cartão não encontrado")
@@ -39,6 +58,32 @@ class InformaViagemControllerTest {
         mockMvc.perform(post("/informa/viagens/cartoes/id")
                         .locale(new Locale("pt", "BR"))
                         .content(gson.toJson(informaViagemForm))
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Informe de viagem com falha fim da viagem nula")
+    public void informeViagemComFalhaFimViagemNula() throws Exception {
+
+        PropostaForm propostaForm = new PropostaForm("642.325.460-57", "antonio@email.com", "Antonio",
+                "Rua Waldemar Eggers", new BigDecimal("400.00"));
+
+        Cartao cartao = new Cartao("5514-7361-7379-6190", "Antonio", LocalDateTime.now(),
+                new BigDecimal("1.00"), propostaForm.converteParaModelProposta(propostaRepository));
+        cartaoRepository.save(cartao);
+
+        //InformaViagemForm informaViagemForm = new InformaViagemForm("Joinville", LocalDate.of(2021,12,12));
+        //continuar
+        InformaViagemForm informaViagemForm = new InformaViagemForm("Joinville", null);
+
+        mockMvc.perform(post("/informa/viagens/cartoes/5514-7361-7379-6190")
+                        .locale(new Locale("pt", "BR"))
+                        .content(gson.toJson(informaViagemForm))
+                        .header("User-Agent", "PostmanRuntime/7.28.4")
+                        .header("Host", "127.0.0.1")
                         .contentType(MediaType.APPLICATION_JSON))
 
                 .andDo(print())

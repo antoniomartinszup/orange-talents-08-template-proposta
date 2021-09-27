@@ -2,6 +2,7 @@ package br.com.zupacademy.antonio.proposta.proposta;
 
 import br.com.zupacademy.antonio.proposta.proposta.analiseproposta.AnaliseFinanceiraFeign;
 import br.com.zupacademy.antonio.proposta.proposta.metricasproposta.PropostaMetricas;
+import br.com.zupacademy.antonio.proposta.security.Mascara;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import org.slf4j.Logger;
@@ -49,7 +50,8 @@ public class PropostaController {
         propostaSalva.propostaStatus(analiseFinanceiraFeign);
 
         propostaMetricas.contador();
-        logger.info("A Proposta para o cliente {} foi gerada com sucesso com o id {}", propostaSalva.getNome(), propostaSalva.getId());
+        logger.info("A Proposta para o cliente {} foi gerada com sucesso com o id {} para o documento {}",
+                propostaSalva.getNome(), propostaSalva.getId(), Mascara.documento(propostaForm.getDocumento()));
 
         URI uri = uriBuilder.path("/propostas/{id}").buildAndExpand(propostaSalva.getId()).toUri();
         return ResponseEntity.created(uri).body(new PropostaDto(propostaSalva));

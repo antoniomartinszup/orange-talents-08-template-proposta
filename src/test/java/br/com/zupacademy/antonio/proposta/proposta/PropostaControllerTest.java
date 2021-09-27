@@ -119,9 +119,45 @@ class PropostaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
 
                 .andDo(print())
-                .andExpect(status().is(422))
-                .andExpect(jsonPath("$.campo").value("422 UNPROCESSABLE_ENTITY Proposta já enviada para o documento apresentado!"))
-                .andExpect(jsonPath("$.erro").exists())
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$[0].campo").value("documento"))
+                .andExpect(jsonPath("$[0].erro").value("Item já cadastrado"))
+                .andReturn().getResponse();
+    }
+
+    @Test
+    @DisplayName("Falha no cadastro da Proposta atributo Salario Negativo")
+    void falhaNoCadastroPropostaSalarioNegativo() throws Exception {
+        PropostaForm propostaForm = new PropostaForm("642.325.460-573", "antonio@email.com", "Antonio",
+                "Rua Waldemar Eggers", new BigDecimal("-1.0"));
+
+        mockMvc.perform(post("/propostas")
+                        .locale(new Locale("pt", "BR"))
+                        .content(gson.toJson(propostaForm))
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].campo").exists())
+                .andExpect(jsonPath("$[0].erro").exists())
+                .andReturn().getResponse();
+    }
+
+    @Test
+    @DisplayName("Falha no cadastro da Proposta atributo Email Invalido")
+    void falhaNoCadastroPropostaEmailInvalido() throws Exception {
+        PropostaForm propostaForm = new PropostaForm("642.325.460-573", "antoniomartins.com", "Antonio",
+                "Rua Waldemar Eggers", new BigDecimal("400.00"));
+
+        mockMvc.perform(post("/propostas")
+                        .locale(new Locale("pt", "BR"))
+                        .content(gson.toJson(propostaForm))
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].campo").exists())
+                .andExpect(jsonPath("$[0].erro").exists())
                 .andReturn().getResponse();
     }
 }

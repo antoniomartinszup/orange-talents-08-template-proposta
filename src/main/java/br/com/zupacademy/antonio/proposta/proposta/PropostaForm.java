@@ -1,6 +1,7 @@
 package br.com.zupacademy.antonio.proposta.proposta;
 
 import br.com.zupacademy.antonio.proposta.validate.AnyCPFOrCNPJ;
+import br.com.zupacademy.antonio.proposta.validate.UniqueValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import javax.validation.constraints.*;
@@ -10,6 +11,7 @@ import java.util.Optional;
 public class PropostaForm {
 
     @AnyCPFOrCNPJ
+    @UniqueValue
     @NotBlank
     private String documento;
 

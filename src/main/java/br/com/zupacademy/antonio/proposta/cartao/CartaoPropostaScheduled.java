@@ -5,6 +5,7 @@ import br.com.zupacademy.antonio.proposta.cartao.analisecartao.AnaliseCartaoFeig
 import br.com.zupacademy.antonio.proposta.proposta.Proposta;
 import br.com.zupacademy.antonio.proposta.proposta.PropostaRepository;
 import br.com.zupacademy.antonio.proposta.proposta.PropostaStatus;
+import br.com.zupacademy.antonio.proposta.security.Mascara;
 import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +35,10 @@ public class CartaoPropostaScheduled {
                 Cartao cartao = analiseCartaoDto.converteParaCartao(proposta);
                 proposta.setCartao(cartao);
                 propostaRepository.save(proposta);
-                logger.info("A proposta com id {} foi associada ao cartao com id {}", proposta.getId(), cartao.getId());
+                logger.info("A proposta com id {} foi associada ao cartao com id {}", proposta.getId(), Mascara.numeroCartao(cartao.getId()));
             } catch (FeignException feignException) {
                 logger.error("Ocorreu uma FALHA com status {} no bloqueio do cartão com o numero {}",
-                        feignException.status(), proposta.getCartao().getId());
+                        feignException.status(), Mascara.numeroCartao(proposta.getCartao().getId()));
                 feignException.printStackTrace();
             }
         }

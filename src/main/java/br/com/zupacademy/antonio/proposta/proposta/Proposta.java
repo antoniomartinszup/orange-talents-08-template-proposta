@@ -4,6 +4,7 @@ import br.com.zupacademy.antonio.proposta.cartao.Cartao;
 import br.com.zupacademy.antonio.proposta.proposta.analiseproposta.AnaliseFinanceiraFeign;
 import br.com.zupacademy.antonio.proposta.proposta.analiseproposta.AnalisePropostaDto;
 import br.com.zupacademy.antonio.proposta.proposta.analiseproposta.AnalisePropostaForm;
+import br.com.zupacademy.antonio.proposta.security.CryptoUtil;
 import br.com.zupacademy.antonio.proposta.validate.AnyCPFOrCNPJ;
 import feign.FeignException;
 
@@ -18,7 +19,6 @@ public class Proposta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @AnyCPFOrCNPJ
     @NotBlank
     @Column(unique = true)
     private String documento;
@@ -52,7 +52,7 @@ public class Proposta {
                     @NotBlank String nome,
                     @NotBlank String endereco,
                     @NotNull @PositiveOrZero BigDecimal salario) {
-        this.documento = documento;
+        this.documento = CryptoUtil.encrypt(documento);
         this.email = email;
         this.nome = nome;
         this.endereco = endereco;
@@ -76,7 +76,7 @@ public class Proposta {
     }
 
     public String getDocumento() {
-        return documento;
+        return CryptoUtil.decrypt(documento);
     }
 
     public String getEmail() {
